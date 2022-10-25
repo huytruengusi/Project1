@@ -38,7 +38,8 @@ def ReadLabel(fileName):
     f = open(fileName, 'r')
     lines = f.read().splitlines()
     f.close()
-
+    print(lines)
+    print("\n\n\n\n")
     # true_label = []
 
     # for i in range(len(lines)):
@@ -53,15 +54,15 @@ def d(i,j):
 def calc_matrix_distance(items):
     '''Caculate distance between two elements
     Return matrix distance of it'''
-    # return [[d(items[i], items[j]) for j in range(len(items))] for i in range(len(items))]
+    return [[d(items[i], items[j]) for j in range(len(items))] for i in range(len(items))]
     
-    dist = []
-    for i in range(len(items)):
-        current = []
-        for j in range(len(items)):
-            current.append(d(items[i],items[j]))
-        dist.append(current)
-    return dist
+    # dist = []
+    # for i in range(len(items)):
+    #     current = []
+    #     for j in range(len(items)):
+    #         current.append(d(items[i],items[j]))
+    #     dist.append(current)
+    # return dist
 
 def init_fuzzification_coefficient(items, number_clusters):
     '''Calculate list of fuzzification coefficient correspond with each element'''
@@ -118,18 +119,31 @@ def update_U(distance_matrix, fuzzification_coefficient):
     '''Update membership value for each iteration'''
 
     U = []
-    for i in range(len(distance_matrix)):
+    for vector in distance_matrix:
         current = []
-        for j in range(len(distance_matrix[0])):
+        for j in range(len(vector)):
             dummy = 0
-            for l in range(len(distance_matrix[0])):
-                if distance_matrix[i][l] == 0:
+            for l in range(len(vector)):
+                if vector[l] == 0:
                     current.append(0)
                     break
-                dummy += (distance_matrix[i][j] / distance_matrix[i][l]) ** (2 / (fuzzification_coefficient[i] - 1))
+                dummy += (vector[j] / vector[l]) ** (2 / (m - 1))
             else:
                 current.append(1/dummy)
         U.append(current)
+    
+    # for i in range(len(distance_matrix)):
+    #     current = []
+    #     for j in range(len(distance_matrix[0])):
+    #         dummy = 0
+    #         for l in range(len(distance_matrix[0])):
+    #             if distance_matrix[i][l] == 0:
+    #                 current.append(0)
+    #                 break
+    #             dummy += (distance_matrix[i][j] / distance_matrix[i][l]) ** (2 / (fuzzification_coefficient[i] - 1))
+    #         else:
+    #             current.append(1/dummy)
+    #     U.append(current)
     return U
 
 def update_V(items, U, fuzzification_coefficient):
@@ -185,8 +199,8 @@ def assign_label(U):
         label.append(max_index)
 
     return label
-items= ReadData('dataset\wdbc_data.txt')
-true_label = ReadLabel('dataset\wdbc_label.txt')
+items= ReadData('../dataset/wdbc_data.txt')
+true_label = ReadLabel('pythonProject\dataset\wdbc_label.txt')
 U,V = MC_FCM(items,2)
 label = assign_label(U)
 print(U,true_label,label,sep='\n')

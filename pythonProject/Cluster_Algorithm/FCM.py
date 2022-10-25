@@ -72,12 +72,13 @@ def init_C(items, number_clusters):
 
 def calc_distance_item_to_cluster(items, V):
     ''' Calculate distance matrix distance between item and cluster '''
-    distance_matrix = []
-    for i in range(len(items)):
-        current = []
-        for j in range(len(V)):
-            current.append(d(items[i], V[j]))
-        distance_matrix.append(current)
+    distance_matrix = [[d(items[i], V[j]) for j in range(len(V))] for i in range(len(items))]
+    # distance_matrix = []
+    # for i in range(len(items)):
+    #     current = []
+    #     for j in range(len(V)):
+    #         current.append(d(items[i], V[j]))
+    #     distance_matrix.append(current)
 
     return distance_matrix
 
@@ -85,18 +86,32 @@ def update_U(distance_matrix):
     '''Update membership value for each iteration'''
     global m
     U = []
-    for i in range(len(distance_matrix)):
+    for vector in distance_matrix:
         current = []
-        for j in range(len(distance_matrix[0])):
+        for j in range(len(vector)):
             dummy = 0
-            for l in range(len(distance_matrix[0])):
-                if distance_matrix[i][l] == 0:
+            for l in range(len(vector)):
+                if vector[l] == 0:
                     current.append(0)
                     break
-                dummy += (distance_matrix[i][j] / distance_matrix[i][l]) ** (2 / (m - 1))
+                dummy += (vector[j] / vector[l]) ** (2 / (m - 1))
             else:
                 current.append(1/dummy)
         U.append(current)
+    
+    
+    # for i in range(len(distance_matrix)):
+    #     current = []
+    #     for j in range(len(distance_matrix[0])):
+    #         dummy = 0
+    #         for l in range(len(distance_matrix[0])):
+    #             if distance_matrix[i][l] == 0:
+    #                 current.append(0)
+    #                 break
+    #             dummy += (distance_matrix[i][j] / distance_matrix[i][l]) ** (2 / (m - 1))
+    #         else:
+    #             current.append(1/dummy)
+    #     U.append(current)
     return U
 
 def update_V(items, U):
@@ -154,8 +169,8 @@ def assign_label(U):
     return label
 
 
-items= ReadData('dataset\wdbc_data.txt')
-true_label = ReadLabel('dataset\wdbc_label.txt')
+items= ReadData('pythonProject\dataset\wdbc_data.txt')
+true_label = ReadLabel('pythonProject\dataset\wdbc_label.txt')
 
 U,V = FCM(items,2)
 label = assign_label(U)
